@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -256,7 +256,11 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+int __io_putchar(int ch){
+	//HAL_UART_Transmit(&huart2, (uint8_t*)&ch, 1, 0XFFFF);
+	ITM_SendChar(ch);
+	return ch;
+}
 /* USER CODE END 4 */
 
 /**
