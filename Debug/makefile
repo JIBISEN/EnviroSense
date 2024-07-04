@@ -10,6 +10,13 @@ RM := rm -rf
 # All of the sources participating in the build are defined here
 -include sources.mk
 -include Drivers/STM32L1xx_HAL_Driver/Src/subdir.mk
+-include Drivers/BSP/IKS01A3/subdir.mk
+-include Drivers/BSP/Components/stts751/subdir.mk
+-include Drivers/BSP/Components/lsm6dso/subdir.mk
+-include Drivers/BSP/Components/lps22hh/subdir.mk
+-include Drivers/BSP/Components/lis2mdl/subdir.mk
+-include Drivers/BSP/Components/lis2dw12/subdir.mk
+-include Drivers/BSP/Components/hts221/subdir.mk
 -include Core/Startup/subdir.mk
 -include Core/Src/subdir.mk
 -include objects.mk
@@ -60,8 +67,8 @@ all: main-build
 main-build: EnviroSense.elf secondary-outputs
 
 # Tool invocations
-EnviroSense.elf EnviroSense.map: $(OBJS) $(USER_OBJS) C:\Users\Jibi\STM32CubeIDE\workspace_1.15.0\EnviroSense\STM32L152RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "EnviroSense.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\Users\Jibi\STM32CubeIDE\workspace_1.15.0\EnviroSense\STM32L152RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="EnviroSense.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+EnviroSense.elf EnviroSense.map: $(OBJS) $(USER_OBJS) C:\Users\Team-CM\STM32CubeIDE\workspace_1.13.2\EnviroSense\STM32L152RETX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
+	arm-none-eabi-gcc -o "EnviroSense.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m3 -T"C:\Users\Team-CM\STM32CubeIDE\workspace_1.13.2\EnviroSense\STM32L152RETX_FLASH.ld" --specs=nosys.specs -Wl,-Map="EnviroSense.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
 	@echo 'Finished building target: $@'
 	@echo ' '
 

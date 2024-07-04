@@ -23,8 +23,21 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/STM32L1xx_HAL_Driver/Inc/stm32l1xx_hal_i2c.h \
  ../Drivers/STM32L1xx_HAL_Driver/Inc/stm32l1xx_hal_pwr.h \
  ../Drivers/STM32L1xx_HAL_Driver/Inc/stm32l1xx_hal_pwr_ex.h \
+ ../Drivers/STM32L1xx_HAL_Driver/Inc/stm32l1xx_hal_spi.h \
  ../Drivers/STM32L1xx_HAL_Driver/Inc/stm32l1xx_hal_uart.h \
- ../Drivers/STM32L1xx_HAL_Driver/Inc/stm32l1xx_hal_exti.h
+ ../Drivers/STM32L1xx_HAL_Driver/Inc/stm32l1xx_hal_exti.h \
+ ../Drivers/BSP/IKS01A3/iks01a3_env_sensors.h \
+ ../X-CUBE-MEMS1/Target/iks01a3_conf.h ../Core/Inc/stm32l1xx_nucleo_bus.h \
+ ../Core/Inc/stm32l1xx_nucleo_conf.h ../Core/Inc/stm32l1xx_nucleo_errno.h \
+ ../Core/Inc/stm32l1xx_nucleo_errno.h \
+ ../Drivers/BSP/Components/Common/env_sensor.h \
+ ../Drivers/BSP/Components/hts221/hts221.h \
+ ../Drivers/BSP/Components/hts221/hts221_reg.h \
+ ../Drivers/BSP/Components/lps22hh/lps22hh.h \
+ ../Drivers/BSP/Components/lps22hh/lps22hh_reg.h \
+ ../Drivers/BSP/Components/stts751/stts751.h \
+ ../Drivers/BSP/Components/stts751/stts751_reg.h \
+ ../Core/Inc/max7219_Yncrea2.h
 ../Core/Inc/main.h:
 ../Drivers/STM32L1xx_HAL_Driver/Inc/stm32l1xx_hal.h:
 ../Core/Inc/stm32l1xx_hal_conf.h:
@@ -50,5 +63,20 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/STM32L1xx_HAL_Driver/Inc/stm32l1xx_hal_i2c.h:
 ../Drivers/STM32L1xx_HAL_Driver/Inc/stm32l1xx_hal_pwr.h:
 ../Drivers/STM32L1xx_HAL_Driver/Inc/stm32l1xx_hal_pwr_ex.h:
+../Drivers/STM32L1xx_HAL_Driver/Inc/stm32l1xx_hal_spi.h:
 ../Drivers/STM32L1xx_HAL_Driver/Inc/stm32l1xx_hal_uart.h:
 ../Drivers/STM32L1xx_HAL_Driver/Inc/stm32l1xx_hal_exti.h:
+../Drivers/BSP/IKS01A3/iks01a3_env_sensors.h:
+../X-CUBE-MEMS1/Target/iks01a3_conf.h:
+../Core/Inc/stm32l1xx_nucleo_bus.h:
+../Core/Inc/stm32l1xx_nucleo_conf.h:
+../Core/Inc/stm32l1xx_nucleo_errno.h:
+../Core/Inc/stm32l1xx_nucleo_errno.h:
+../Drivers/BSP/Components/Common/env_sensor.h:
+../Drivers/BSP/Components/hts221/hts221.h:
+../Drivers/BSP/Components/hts221/hts221_reg.h:
+../Drivers/BSP/Components/lps22hh/lps22hh.h:
+../Drivers/BSP/Components/lps22hh/lps22hh_reg.h:
+../Drivers/BSP/Components/stts751/stts751.h:
+../Drivers/BSP/Components/stts751/stts751_reg.h:
+../Core/Inc/max7219_Yncrea2.h:
