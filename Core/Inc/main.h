@@ -49,22 +49,35 @@ extern "C" {
 
 /* USER CODE END EM */
 
+void HAL_TIM_MspPostInit(TIM_HandleTypeDef *htim);
+
 /* Exported functions prototypes ---------------------------------------------*/
 void Error_Handler(void);
 
 /* USER CODE BEGIN EFP */
-
+void TIM6_IRQ(void);
+void TIM7_IRQ(void);
+int Conf_TEMP(void);
+void display_temp(void);
+void reglage(uint8_t flag_bp);
+uint32_t Aquire_cons(void);
+void display_cons(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
 #define B1_Pin GPIO_PIN_13
 #define B1_GPIO_Port GPIOC
+#define B1_EXTI_IRQn EXTI15_10_IRQn
 #define USART_TX_Pin GPIO_PIN_2
 #define USART_TX_GPIO_Port GPIOA
 #define USART_RX_Pin GPIO_PIN_3
 #define USART_RX_GPIO_Port GPIOA
 #define L0_Pin GPIO_PIN_1
 #define L0_GPIO_Port GPIOB
+#define L1_Pin GPIO_PIN_2
+#define L1_GPIO_Port GPIOB
+#define L2_Pin GPIO_PIN_10
+#define L2_GPIO_Port GPIOB
 #define SPI_CS_Pin GPIO_PIN_8
 #define SPI_CS_GPIO_Port GPIOA
 #define TMS_Pin GPIO_PIN_13
