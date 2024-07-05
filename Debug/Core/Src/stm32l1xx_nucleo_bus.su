@@ -10,4 +10,4 @@
 ../Core/Src/stm32l1xx_nucleo_bus.c:388:9:BSP_GetTick	8	static
 ../Core/Src/stm32l1xx_nucleo_bus.c:394:26:MX_I2C1_Init	24	static
 ../Core/Src/stm32l1xx_nucleo_bus.c:415:13:I2C1_MspInit	48	static
-../Core/Src/stm32l1xx_nucleo_bus.c:448:13:I2C1_MspDeInit	16	static
+../Core/Src/stm32l1xx_nucleo_bus.c:454:13:I2C1_MspDeInit	16	static
