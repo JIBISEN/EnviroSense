@@ -1,4 +1,3 @@
-../Drivers/CMSIS/Include/core_cm3.h:1876:26:ITM_SendChar	16	static,ignoring_inline_asm
 ../Core/Src/main.c:107:6:TIM6_IRQ	4	static
 ../Core/Src/main.c:116:6:TIM7_IRQ	8	static
 ../Core/Src/main.c:122:6:ACCEL_IRQ	4	static
