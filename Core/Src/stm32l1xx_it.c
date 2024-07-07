@@ -32,7 +32,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define DEBOUNCE_DELAY 100 // 20ms debounce delay
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -42,6 +42,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
+//uint8_t reg = 0,reg1 =0;
 volatile uint8_t bp1_state = 0;
 volatile uint8_t bp2_state = 0;
 
@@ -62,6 +63,7 @@ volatile uint8_t debounce_flag2 = 0;
 /* External variables --------------------------------------------------------*/
 extern I2C_HandleTypeDef hi2c1;
 extern TIM_HandleTypeDef htim2;
+extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim6;
 extern TIM_HandleTypeDef htim7;
 /* USER CODE BEGIN EV */
@@ -207,6 +209,21 @@ void SysTick_Handler(void)
 /******************************************************************************/
 
 /**
+  * @brief This function handles EXTI line0 interrupt.
+  */
+void EXTI0_IRQHandler(void)
+{
+  /* USER CODE BEGIN EXTI0_IRQn 0 */
+
+  /* USER CODE END EXTI0_IRQn 0 */
+  HAL_GPIO_EXTI_IRQHandler(Accel_INT_Pin);
+  /* USER CODE BEGIN EXTI0_IRQn 1 */
+  printf("INT Accel !! \r\n");
+  ACCEL_IRQ();
+  /* USER CODE END EXTI0_IRQn 1 */
+}
+
+/**
   * @brief This function handles TIM2 global interrupt.
   */
 void TIM2_IRQHandler(void)
@@ -218,6 +235,20 @@ void TIM2_IRQHandler(void)
   /* USER CODE BEGIN TIM2_IRQn 1 */
 
   /* USER CODE END TIM2_IRQn 1 */
+}
+
+/**
+  * @brief This function handles TIM3 global interrupt.
+  */
+void TIM3_IRQHandler(void)
+{
+  /* USER CODE BEGIN TIM3_IRQn 0 */
+
+  /* USER CODE END TIM3_IRQn 0 */
+  HAL_TIM_IRQHandler(&htim3);
+  /* USER CODE BEGIN TIM3_IRQn 1 */
+
+  /* USER CODE END TIM3_IRQn 1 */
 }
 
 /**
@@ -254,7 +285,7 @@ void I2C1_ER_IRQHandler(void)
 void EXTI15_10_IRQHandler(void)
 {
   /* USER CODE BEGIN EXTI15_10_IRQn 0 */
-	printf("BP1\r\n");
+
   /* USER CODE END EXTI15_10_IRQn 0 */
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_11);
   HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_12);
@@ -274,8 +305,9 @@ void TIM6_IRQHandler(void)
   /* USER CODE END TIM6_IRQn 0 */
   HAL_TIM_IRQHandler(&htim6);
   /* USER CODE BEGIN TIM6_IRQn 1 */
+  //buzzer (0);
   TIM6_IRQ();
-  printf("T6\r\n");
+  //printf("T6\r\n");
   /* USER CODE END TIM6_IRQn 1 */
 }
 
@@ -290,7 +322,7 @@ void TIM7_IRQHandler(void)
   HAL_TIM_IRQHandler(&htim7);
   /* USER CODE BEGIN TIM7_IRQn 1 */
 	TIM7_IRQ();
-	printf("T7\r\n");
+	//printf("T7\r\n");
   /* USER CODE END TIM7_IRQn 1 */
 }
 
@@ -301,32 +333,30 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	if(GPIO_Pin == GPIO_PIN_11){
 		if(!debounce_flag1){
 			debounce_flag1 = 1;
-			printf("11\r\n");
+			printf("BTN1\r\n");
 			__HAL_TIM_SET_COUNTER(&htim2, 0);
 			HAL_TIM_Base_Start_IT(&htim2);
-			reglage(1);
+			if (bp1_state){
+				bp1_state = 0;
+				__HAL_TIM_SET_COUNTER(&htim6, 0);
+				HAL_TIM_Base_Start_IT(&htim6);
+				HAL_TIM_Base_Stop_IT(&htim7);
+			}else{
+				__HAL_TIM_SET_COUNTER(&htim7, 0);
+				HAL_TIM_Base_Start_IT(&htim7);
+				HAL_TIM_Base_Stop_IT(&htim6);
+				bp1_state = 1;
+			}
 		}}
-
-	if(GPIO_Pin == GPIO_PIN_12){
-		if(!debounce_flag2){
-			debounce_flag2 = 1;
-			printf("12\r\n");
-			__HAL_TIM_SET_COUNTER(&htim2, 0);
-			HAL_TIM_Base_Start_IT(&htim2);
-			reglage(0);
-		}}
-
 }
 
 void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
     if (htim->Instance == TIM2){
-        if (debounce_flag1){
+
+        if (debounce_flag1)
+        {
             debounce_flag1 = 0;
         }
-        if (debounce_flag2){
-            debounce_flag2 = 0;
-        }
-
         HAL_TIM_Base_Stop_IT(&htim2); // Stop the timer
     }
 }
