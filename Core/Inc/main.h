@@ -57,12 +57,18 @@ void Error_Handler(void);
 /* USER CODE BEGIN EFP */
 void TIM6_IRQ(void);
 void TIM7_IRQ(void);
+void ACCEL_IRQ(void);
 int Conf_TEMP(void);
-void display_temp(void);
+int Conf_ACCEL(void);
 void reglage(uint8_t flag_bp);
 uint32_t Aquire_cons(void);
+void Aquire_temp(void);
+void display_temp(void);
 void display_cons(void);
+void Affichage_TEMP(void);
 void motor(int MotorState);
+void buzzer (int BuzzerState);
+void GestionLed(int LedState);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
@@ -73,6 +79,9 @@ void motor(int MotorState);
 #define USART_TX_GPIO_Port GPIOA
 #define USART_RX_Pin GPIO_PIN_3
 #define USART_RX_GPIO_Port GPIOA
+#define Accel_INT_Pin GPIO_PIN_0
+#define Accel_INT_GPIO_Port GPIOB
+#define Accel_INT_EXTI_IRQn EXTI0_IRQn
 #define L0_Pin GPIO_PIN_1
 #define L0_GPIO_Port GPIOB
 #define L1_Pin GPIO_PIN_2
@@ -81,6 +90,10 @@ void motor(int MotorState);
 #define L2_GPIO_Port GPIOB
 #define L3_Pin GPIO_PIN_11
 #define L3_GPIO_Port GPIOB
+#define L4_Pin GPIO_PIN_12
+#define L4_GPIO_Port GPIOB
+#define Buzz_Pin GPIO_PIN_7
+#define Buzz_GPIO_Port GPIOC
 #define SPI_CS_Pin GPIO_PIN_8
 #define SPI_CS_GPIO_Port GPIOA
 #define TMS_Pin GPIO_PIN_13
