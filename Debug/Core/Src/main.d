@@ -41,7 +41,18 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
  ../Drivers/BSP/Components/lps22hh/lps22hh_reg.h \
  ../Drivers/BSP/Components/stts751/stts751.h \
  ../Drivers/BSP/Components/stts751/stts751_reg.h \
- ../Core/Inc/max7219_Yncrea2.h
+ ../Drivers/BSP/IKS01A3/iks01a3_motion_sensors.h \
+ ../Drivers/BSP/Components/Common/motion_sensor.h \
+ ../Drivers/BSP/Components/lsm6dso/lsm6dso.h \
+ ../Drivers/BSP/Components/lsm6dso/lsm6dso_reg.h \
+ ../Drivers/BSP/Components/lis2dw12/lis2dw12.h \
+ ../Drivers/BSP/Components/lis2dw12/lis2dw12_reg.h \
+ ../Drivers/BSP/Components/lis2mdl/lis2mdl.h \
+ ../Drivers/BSP/Components/lis2mdl/lis2mdl_reg.h \
+ ../Core/Inc/max7219_Yncrea2.h \
+ ../Drivers/BSP/IKS01A3/iks01a3_motion_sensors_ex.h \
+ ../Drivers/BSP/IKS01A3/iks01a3_motion_sensors.h \
+ ../Core/Inc/Gestion_LED.h
 ../Core/Inc/main.h:
 ../Drivers/STM32L1xx_HAL_Driver/Inc/stm32l1xx_hal.h:
 ../Core/Inc/stm32l1xx_hal_conf.h:
@@ -87,4 +98,15 @@ Core/Src/main.o: ../Core/Src/main.c ../Core/Inc/main.h \
 ../Drivers/BSP/Components/lps22hh/lps22hh_reg.h:
 ../Drivers/BSP/Components/stts751/stts751.h:
 ../Drivers/BSP/Components/stts751/stts751_reg.h:
+../Drivers/BSP/IKS01A3/iks01a3_motion_sensors.h:
+../Drivers/BSP/Components/Common/motion_sensor.h:
+../Drivers/BSP/Components/lsm6dso/lsm6dso.h:
+../Drivers/BSP/Components/lsm6dso/lsm6dso_reg.h:
+../Drivers/BSP/Components/lis2dw12/lis2dw12.h:
+../Drivers/BSP/Components/lis2dw12/lis2dw12_reg.h:
+../Drivers/BSP/Components/lis2mdl/lis2mdl.h:
+../Drivers/BSP/Components/lis2mdl/lis2mdl_reg.h:
 ../Core/Inc/max7219_Yncrea2.h:
+../Drivers/BSP/IKS01A3/iks01a3_motion_sensors_ex.h:
+../Drivers/BSP/IKS01A3/iks01a3_motion_sensors.h:
+../Core/Inc/Gestion_LED.h:
