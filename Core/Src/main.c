@@ -12,7 +12,7 @@
   * This software is licensed under terms that can be found in the LICENSE file
   * in the root directory of this software component.
   * If no LICENSE file comes with this software, it is provided AS-IS.
-  * test max
+  *
   ******************************************************************************
   */
 /* USER CODE END Header */
@@ -24,7 +24,10 @@
 #include "stdio.h"
 #include "string.h"
 #include "iks01a3_env_sensors.h"
+#include "iks01a3_motion_sensors.h"
 #include "max7219_Yncrea2.h"
+#include "iks01a3_motion_sensors_ex.h"
+#include "Gestion_LED.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -35,6 +38,12 @@
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 # define MAX_BUF_SIZE 256
+# define Aff_Temp 		0
+# define Aff_Cons 		1
+# define Aff_AlarmTemp 	2
+# define Aff_AlarmAccel 3
+# define All_Off 		4
+# define All_On			5
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -58,7 +67,7 @@ UART_HandleTypeDef huart2;
 static float Temperature;
 static char dataOut1[MAX_BUF_SIZE];
 extern 	int reg;
-uint8_t flag_irq = 0;
+uint8_t flag_irq =  0;
 uint8_t flag_irq2 = 0;
 char buff[4];
 /* USER CODE END PV */
@@ -74,6 +83,7 @@ static void MX_TIM6_Init(void);
 static void MX_TIM7_Init(void);
 static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
+
 
 /* USER CODE END PFP */
 
@@ -94,7 +104,7 @@ typedef struct displayFloatToInt_s
   uint32_t out_dec;
 } displayFloatToInt_t;
 
-void TIM6_IRQ(void)
+void TIM6_IRQ(void)	//Interruption du timer 6 à 1 seconde
 {
 	if(flag_irq){
 		flag_irq = 0;
@@ -103,12 +113,16 @@ void TIM6_IRQ(void)
 	}
 
 }
-void TIM7_IRQ(void)
+void TIM7_IRQ(void)//Interruption du timer 7 à 1/2 seconde
 {
 		display_cons();
 		flag_irq = 0;
 }
 
+void ACCEL_IRQ(void)//Interruprion de l'accel
+{
+	flag_irq2 = 1;
+}
 static void floatToInt(float in, displayFloatToInt_t *out_value, int32_t dec_prec)
 {
   if(in >= 0.0f)
@@ -159,10 +173,7 @@ void display_temp(void)
 /*Fonction d'affichage de la temperature sur les 7 segments*/
 void display_cons(void)
 {
-	HAL_GPIO_WritePin(GPIOB, L0_Pin, 0);
-	HAL_GPIO_WritePin(GPIOB, L1_Pin, 0);
-	HAL_GPIO_WritePin(GPIOB, L2_Pin, 0);
-	HAL_GPIO_WritePin(GPIOB, L3_Pin, 1);
+	GestionLed(Aff_Cons);
 	char buff[4];
 	uint32_t cons;
 	cons = Aquire_cons();
@@ -178,7 +189,6 @@ void Affichage_TEMP(void)
 {
 	IKS01A3_ENV_SENSOR_Enable(IKS01A3_STTS751_0, ENV_TEMPERATURE);
 	IKS01A3_ENV_SENSOR_GetValue(IKS01A3_STTS751_0, ENV_TEMPERATURE, &Temperature);
-	//IKS01A3_ENV_SENSOR_DeInit(IKS01A3_STTS751_0);
 	displayFloatToInt_t out_value;
 	floatToInt(Temperature, &out_value, 2);
 	snprintf(dataOut1, MAX_BUF_SIZE, "Temperature: %c%d.%02d degC ", ((out_value.sign > 0) ? '-' : '+'), (int)out_value.out_int, (int)out_value.out_dec);
@@ -199,16 +209,65 @@ uint32_t Aquire_cons(void)
 void motor(int MotorState)
 {
 	if(MotorState){
-		HAL_GPIO_TogglePin(GPIOB, L3_Pin);
+
+		TIM3->PSC = 32000;
+		TIM3->ARR = 1000;
 		HAL_TIM_PWM_Start_IT(&htim3,TIM_CHANNEL_1);
-		printf("Motor Enable \n\r");
+		//printf("Motor Enable \n\r");
 	}
 	else{
-		HAL_GPIO_TogglePin(GPIOB, L3_Pin);
+		GestionLed(All_Off);
 		HAL_TIM_PWM_Stop_IT(&htim3,TIM_CHANNEL_1);
-		printf("Motor Disable \n\r");
+		//printf("Motor Disable \n\r");
 	}
 }
+
+void buzzer (int BuzzerState)
+{
+	if(BuzzerState)
+	{
+		GestionLed(Aff_AlarmAccel);
+		TIM3->PSC = 31;
+		TIM3->ARR = 2278;
+		HAL_TIM_PWM_Start_IT(&htim3,TIM_CHANNEL_2);
+	}
+	else{
+		GestionLed(All_Off);
+		HAL_TIM_PWM_Stop_IT(&htim3,TIM_CHANNEL_2);
+	}
+}
+
+int Conf_ACCEL(void)
+{
+	  if(IKS01A3_MOTION_SENSOR_Init(IKS01A3_LIS2DW12_0, MOTION_ACCELERO) != BSP_ERROR_NONE)
+	  {
+	 	  printf("Pb of SENSOR_Init\n\r");
+	 	  return 1;
+	  }
+
+	  if(IKS01A3_MOTION_SENSOR_SetFullScale(IKS01A3_LIS2DW12_0, MOTION_ACCELERO, 2) != BSP_ERROR_NONE)
+	   {
+	  	  printf("Pb of SENSOR_SetFullScale\n\r");
+	  	  return 1;
+	   }
+
+	  if(IKS01A3_MOTION_SENSOR_SetOutputDataRate(IKS01A3_LIS2DW12_0, MOTION_ACCELERO, 200.0) != BSP_ERROR_NONE)
+	   {
+	  	  printf("Pb of accelerometer SENSOR_SetOutputDataRate\n\r");
+	  	  return 1;
+	   }
+
+	  if(IKS01A3_MOTION_SENSOR_Enable_6D_Orientation(IKS01A3_LIS2DW12_0, IKS01A3_MOTION_SENSOR_INT1_PIN) != BSP_ERROR_NONE)
+		{
+		  printf("Pb of accelerometer SENSOR_SetOutputDataRate\n\r");
+		  return 1;
+		}
+return 0;
+
+}
+
+
+
 /* USER CODE END 0 */
 
 /**
@@ -255,7 +314,7 @@ int main(void)
   MAX7219_DisplayTestStop();
   printf("Display test finished \r\n");
   Conf_TEMP();
-
+  Conf_ACCEL();
   if(HAL_TIM_Base_Start_IT(&htim6)!= HAL_OK)
   {
     Error_Handler();
@@ -263,7 +322,7 @@ int main(void)
   printf("Timer 6 enabled\r\n");
 
   HAL_TIM_Base_Start_IT(&htim3);
-
+  Aquire_cons();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -273,29 +332,32 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  Aquire_temp();
-	  if(flag_irq ==1)
-	  {
-		  display_temp();
+	  Aquire_temp();	//Aquisition de la temperature
 
+	  if(flag_irq ==1) //On test le flag du timer 6
+	  {
+		  display_temp();	//Affichage de la température sur les afficheurs 7 segments
 		  if(comp.cons < comp.temp){
 			  printf("consigne < temperature !! \r\n");
-			  HAL_TIM_PWM_Start_IT(&htim3,TIM_CHANNEL_1);
-			  HAL_GPIO_WritePin(GPIOB, L0_Pin, 0);
-			  HAL_GPIO_WritePin(GPIOB, L1_Pin, 1);
-			  HAL_GPIO_WritePin(GPIOB, L2_Pin, 0);
-			  HAL_GPIO_WritePin(GPIOB, L3_Pin, 0);
+			  GestionLed(Aff_AlarmTemp);
+			  motor(1);//On active le moteur
 		  }
 		  else{
-		  HAL_TIM_PWM_Stop_IT(&htim3,TIM_CHANNEL_1);
-		  HAL_GPIO_WritePin(GPIOB, L0_Pin, 1);
-		  HAL_GPIO_WritePin(GPIOB, L1_Pin, 0);
-		  HAL_GPIO_WritePin(GPIOB, L2_Pin, 0);
-		  HAL_GPIO_WritePin(GPIOB, L3_Pin, 0);
+			  GestionLed(Aff_Temp);
+			 motor(0);//On eteind le moteur
 		  }
 	  }
-
+	  if(flag_irq2 ==1)//On test le flag de l'interruption de l'accel
+	  {
+		  flag_irq2 = 0;
+		  printf("je buzzz !! \r\n");
+		  buzzer (1);// On buzzz
+		  HAL_Delay(1000); //On attend 1 seconde
+		  buzzer(0);//On eteind le buzzer
+	  }
   }
+
+
   /* USER CODE END 3 */
 }
 
@@ -532,6 +594,11 @@ static void MX_TIM3_Init(void)
   {
     Error_Handler();
   }
+  sConfigOC.Pulse = 1319;
+  if (HAL_TIM_PWM_ConfigChannel(&htim3, &sConfigOC, TIM_CHANNEL_2) != HAL_OK)
+  {
+    Error_Handler();
+  }
   /* USER CODE BEGIN TIM3_Init 2 */
 
   /* USER CODE END TIM3_Init 2 */
@@ -666,7 +733,8 @@ static void MX_GPIO_Init(void)
   __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOB, L0_Pin|L1_Pin|L2_Pin|L3_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOB, L0_Pin|L1_Pin|L2_Pin|L3_Pin
+                          |L4_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(SPI_CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_RESET);
@@ -677,8 +745,16 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_PULLDOWN;
   HAL_GPIO_Init(B1_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : L0_Pin L1_Pin L2_Pin L3_Pin */
-  GPIO_InitStruct.Pin = L0_Pin|L1_Pin|L2_Pin|L3_Pin;
+  /*Configure GPIO pin : Accel_INT_Pin */
+  GPIO_InitStruct.Pin = Accel_INT_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(Accel_INT_GPIO_Port, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : L0_Pin L1_Pin L2_Pin L3_Pin
+                           L4_Pin */
+  GPIO_InitStruct.Pin = L0_Pin|L1_Pin|L2_Pin|L3_Pin
+                          |L4_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -698,6 +774,9 @@ static void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
   /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI0_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI0_IRQn);
+
   HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
@@ -708,8 +787,8 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 int __io_putchar(int ch)
 {
-	//HAL_UART_Transmit(&huart2, (uint8_t*)&ch, 1, 0xFFFF);
-	ITM_SendChar(ch);
+	HAL_UART_Transmit(&huart2, (uint8_t*)&ch, 1, 0xFFFF);
+	//ITM_SendChar(ch);
 	return(ch);
 }
 /* USER CODE END 4 */
@@ -722,7 +801,7 @@ void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
   /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
+  //__disable_irq(); //Modif pour eviter le freeze
   while (1)
   {
   }
