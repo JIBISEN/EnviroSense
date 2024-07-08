@@ -182,6 +182,9 @@ void display_cons(void)
 	MAX7219_DisplayChar1('2',buff[1]);
 	MAX7219_DisplayChar('3',buff[2]);
 	MAX7219_DisplayChar('4',buff[3]);
+	printf("Consigne : %c%c",buff[0],buff[1]);
+	printf(".");
+	printf("%c%c degC \r\n",buff[2],buff[3]);
 }
 /*Fonction affichage de la temperature dans la console ou UART*/
 void Affichage_TEMP(void)
@@ -193,6 +196,7 @@ void Affichage_TEMP(void)
 	floatToInt(Temperature, &out_value, 2);
 	snprintf(dataOut1, MAX_BUF_SIZE, "Temperature: %c%d.%02d degC ", ((out_value.sign > 0) ? '-' : '+'), (int)out_value.out_int, (int)out_value.out_dec);
 	printf("%s \r\n", dataOut1);
+	GestionLed(Aff_Temp);
 }
 /*Fonction pour recuperer la valeur sur l'ADC*/
 uint32_t Aquire_cons(void)
@@ -336,6 +340,7 @@ int main(void)
 
 	  if(flag_irq ==1) //On test le flag du timer 6
 	  {
+		  Affichage_TEMP();
 		  display_temp();	//Affichage de la température sur les afficheurs 7 segments
 		  if(comp.cons < comp.temp){
 			  printf("consigne < temperature !! \r\n");
@@ -343,8 +348,8 @@ int main(void)
 			  motor(1);//On active le moteur
 		  }
 		  else{
-			  GestionLed(Aff_Temp);
 			 motor(0);//On eteind le moteur
+			 HAL_Delay(500);
 		  }
 	  }
 	  if(flag_irq2 ==1)//On test le flag de l'interruption de l'accel
@@ -787,8 +792,8 @@ static void MX_GPIO_Init(void)
 /* USER CODE BEGIN 4 */
 int __io_putchar(int ch)
 {
-	HAL_UART_Transmit(&huart2, (uint8_t*)&ch, 1, 0xFFFF);
-	//ITM_SendChar(ch);
+	//HAL_UART_Transmit(&huart2, (uint8_t*)&ch, 1, 0xFFFF);
+	ITM_SendChar(ch);
 	return(ch);
 }
 /* USER CODE END 4 */
